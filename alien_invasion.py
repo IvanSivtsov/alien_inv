@@ -2,6 +2,7 @@ import sys
 import pygame
 from settings import Settings
 from ship import Ship
+from bullet import Bullet
 
 class AlienInvasion:
     """Class for managing of game bahavior and resources"""
@@ -15,6 +16,9 @@ class AlienInvasion:
         self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
+
+        #Create grope of bullets
+        self.bullets = pygame.sprite.Group()
         
         pygame.display.set_caption("Alien Invasion")
         
@@ -26,8 +30,19 @@ class AlienInvasion:
             self._check_events()
             self._update_screen()
             self.ship.update()
+            self.bullets.update()
+            self._update_bullets()
+
             self.clock.tick(60)
     
+
+    def _update_bullets(self):
+        """Update position of bullets and delete old ones"""
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+
+
     def _check_events(self):
         """Check for events and respond to them"""
         for event in pygame.event.get():
@@ -43,6 +58,8 @@ class AlienInvasion:
         """Update screen with new image"""
         self.screen.fill(self.settings.bg_color)
         self.ship.blitme()
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
         pygame.display.flip()
 
     def _check_keydown_events(self, event):
@@ -54,6 +71,8 @@ class AlienInvasion:
             elif event.key == pygame.K_q:
                 # Exit the game when 'q' is pressed
                 sys.exit()
+            elif event.key == pygame.K_SPACE:
+                self._fire_bullet()
 
     def _check_keyup_events(self, event):
         if event.type == pygame.KEYUP:
@@ -62,6 +81,12 @@ class AlienInvasion:
             elif event.key == pygame.K_LEFT:
                 self.ship.moving_left = False
 
+
+    def _fire_bullet(self):
+        """Create a new bullet and add it to the group"""
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
 
 if __name__ == '__main__':
     #Create instance of class and run game
