@@ -3,6 +3,7 @@ import pygame
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 
 class AlienInvasion:
     """Class for managing of game bahavior and resources"""
@@ -17,12 +18,13 @@ class AlienInvasion:
         self.settings.screen_width = self.screen.get_rect().width
         self.settings.screen_height = self.screen.get_rect().height
 
-        #Create grope of bullets
+        #Create group of bullets
         self.bullets = pygame.sprite.Group()
         
         pygame.display.set_caption("Alien Invasion")
         
         self.ship = Ship(self)
+        self.alien = Alien(self)
 
     def run_game(self):
         """Launch of game loop"""
@@ -32,6 +34,7 @@ class AlienInvasion:
             self.ship.update()
             self.bullets.update()
             self._update_bullets()
+            self.alien.update()
 
             self.clock.tick(60)
     
@@ -60,6 +63,7 @@ class AlienInvasion:
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+        self.alien.blitme()
         pygame.display.flip()
 
     def _check_keydown_events(self, event):
